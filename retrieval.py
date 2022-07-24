@@ -8,13 +8,28 @@ from scipy.spatial import KDTree
 
 from image_retrieval_utils import *
 
+class EuclideanDistance:
+    def __init__(self) -> None:
+        pass
+
+    def calculate_distance(self, x, y):
+        return np.linalg.norm(x - y)
+
+class HistogramComparison:
+    def __init__(self, compare_method=0) -> None:
+        self.compare_method = compare_method
+
+    def calculate_distance(self, x, y):
+        x = np.array(x, dtype=np.float32)
+        y = np.array(y, dtype=np.float32)
+        return cv2.compareHist(x, y, self.compare_method)
 
 def main(
         db_cfg_path='./config/database.json',
         connect_name='mongodb',
         extr_cfg_path='./config/feature_extractor.json',
         list_features=['Color_Histogram_RGB', 'Color_Histogram_HSV', 'HOG_CIFAR_default'],
-        testset_path='./data/cifar-10/test.json'
+        testset_path='./data/coil-100/test.json'
 ):
     with open(db_cfg_path) as f:
         db_config = json.load(f)
@@ -52,11 +67,14 @@ def main(
     with open(testset_path) as f:
         testset_des = json.load(f)
 
-    all_classes = [
-        'airplane', 'automobile', 'bird', 'cat',
-        'deer', 'dog', 'frog', 'horse',
-        'ship', 'truck'
-    ]
+    # all_classes = [
+    #     'airplane', 'automobile', 'bird', 'cat',
+    #     'deer', 'dog', 'frog', 'horse',
+    #     'ship', 'truck'
+    # ]
+    all_classes = []
+    for c in range(1, 100):
+        all_classes.append('obj' + str(c))
     list_n_top = [1, 3, 5, 10]
     count_success = dict()
     count = dict()
@@ -179,18 +197,3 @@ class KDTreeMatcher(Matcher):
 
 if __name__ == '__main__':
     main()
-class EuclideanDistance:
-    def __init__(self) -> None:
-        pass
-
-    def calculate_distance(self, x, y):
-        return np.linalg.norm(x - y)
-
-class HistogramComparison:
-    def __init__(self, compare_method=0) -> None:
-        self.compare_method = compare_method
-
-    def calculate_distance(self, x, y):
-        x = np.array(x, dtype=np.float32)
-        y = np.array(y, dtype=np.float32)
-        return cv2.compareHist(x, y, self.compare_method)

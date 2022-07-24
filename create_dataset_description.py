@@ -2,9 +2,9 @@ import os
 import json
 import itertools
 
-def create_cifar_dataset_description(dataset_path='./data/cifar-10', train_description_path='./data/cifar-10/train.json', test_description_path='./data/cifar-10/test.json'):
+def create_cifar_dataset_description(dataset_path='./data/coil-100', train_description_path='./data/coil-100/train.json', test_description_path='./data/coil-100/test.json'):
 
-    def create_image_description(dataset='cifar-10', subdataset=None, image_path=None, size=None, class_name=None):
+    def create_image_description(dataset='coil-100', subdataset=None, image_path=None, size=None, class_name=None):
         return {
             'dataset': dataset,
             'subdataset': subdataset,
@@ -14,18 +14,22 @@ def create_cifar_dataset_description(dataset_path='./data/cifar-10', train_descr
             'image_name': '_'.join([dataset, subdataset, class_name, image_path.split('/')[-1]])
         }
 
-    classes = [
-        'airplane',
-        'automobile',
-        'bird',
-        'cat',
-        'deer',
-        'dog',
-        'frog',
-        'horse',
-        'ship',
-        'truck'
-    ]
+    # classes = [
+    #     'airplane',
+    #     'automobile',
+    #     'bird',
+    #     'cat',
+    #     'deer',
+    #     'dog',
+    #     'frog',
+    #     'horse',
+    #     'ship',
+    #     'truck'
+    # ]
+    classes = []
+    for c in range(1, 100):
+        classes.append('obj' + str(c))
+    # print(classes)
     train = list()
     test = list()
     size=(32, 32, 3)

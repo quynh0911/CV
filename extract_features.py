@@ -9,7 +9,7 @@ from image_retrieval_utils import *
 import time
 
 
-def extract_and_save(dataset='./data/cifar-10/train.json',
+def extract_and_save(dataset='./data/coil-100/train.json',
                      extractor_config='./config/feature_extractor.json',
                      database_config='./config/database.json'):
     dataset_name = dataset.split('/')[-2]
