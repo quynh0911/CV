@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x"
+      crossorigin="anonymous"
+    />
+    <title>Thị giác máy tính</title>
+    <style>
+      img {
+        height: 100px;
+      }
+      .result-container {
+        height: 65vh;
+        overflow-y: scroll;
+        overflow-x: hidden;
+      }
+      .img-placeholder {
+        margin: auto;
+        width: 100px;
+        height: 100px;
+        background-color: #72FFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="row text-center my-4 py-4 bg-warning" style="background-color: #ff0000">
+      <h5>Thị giác máy tính - Nhóm 9</h5>
+      <h1>Đề 1</h1>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col text-center">
+          {% if error %}
+          <div class="alert alert-danger">{{ error }}</div>
+          {% endif %}
+          {% if original %}
+          <img src="{{ 'static/' + original }}" id="original-img" />
+          <div class="img-placeholder d-none" id="original-placeholder">
+            Your image
+          </div>
+          {% else %}
+          <img src="" class="d-none" id="original-img" />
+          <div class="img-placeholder" id="original-placeholder">
+            Your image
+          </div>
+          {% endif %}
+          <form
+            action="/search"
+            class="mt-5 row"
+            method="POST"
+            enctype="multipart/form-data"
+          >
+            <div class="col-8">
+              <input
+                class="form-control"
+                required
+                type="file"
+                name="q"
+                onchange="readImage(this);"
+                accept=".jpeg,.jpg,.png"
+              />
+            </div>
+            <div class="col-4">
+              <button class="btn btn-outline-primary">Search</button>
+            </div>
+          </form>
+        </div>
+        <div class="col text-center">
+          <h2 class="">Results</h2>
+          <div class="result-container bg-light bg-gradient">
+            {% if results %} {% for img in results %}
+              <img class="m-3 d-inline" src="{{ url_for('get_image', path=img) }}" />
+            {% endfor %} {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const placeholderEl = document.getElementById("original-placeholder");
+      const imgEl = document.getElementById("original-img");
+
+      function readImage(input) {
+        if (input.files && input.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            imgEl.src = e.target.result;
+            imgEl.classList.remove("d-none");
+
+            placeholderEl.class = "d-none";
+          };
+
+          reader.readAsDataURL(input.files[0]);
+        }
+      }
+    </script>
+  </body>
+</html>
