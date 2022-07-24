@@ -1,6 +1,6 @@
 [
     {
-        "name": "HOG_CIFAR_default",
+        "name": "HOG_16x16x32x32",
         "extractor": "feature_extractor.HOG",
         "parameters": {
             "cellSize": [16, 16],
@@ -9,7 +9,7 @@
         }
     },
     {
-        "name": "HOG_CIFAR_8x8x16x16",
+        "name": "HOG_8x8x16x16",
         "extractor": "feature_extractor.HOG",
         "parameters": {
             "cellSize": [8, 8],
@@ -18,7 +18,7 @@
         }
     },
     {
-        "name": "HOG_CIFAR_4x4x8x8",
+        "name": "HOG_4x4x8x8",
         "extractor": "feature_extractor.HOG",
         "parameters": {
             "cellSize": [4, 4],
@@ -27,7 +27,7 @@
         }
     },
     {
-        "name": "HOG_CIFAR_4x4x16x16",
+        "name": "HOG_4x4x16x16",
         "extractor": "feature_extractor.HOG",
         "parameters": {
             "cellSize": [4, 4],

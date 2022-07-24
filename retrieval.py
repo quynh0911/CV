@@ -28,7 +28,7 @@ def main(
         db_cfg_path='./config/database.json',
         connect_name='mongodb',
         extr_cfg_path='./config/feature_extractor.json',
-        list_features=['Color_Histogram_RGB', 'Color_Histogram_HSV', 'HOG_CIFAR_default'],
+        list_features=['Color_Histogram_RGB'],
         testset_path='./data/coil-100/test.json'
 ):
     with open(db_cfg_path) as f:
@@ -75,7 +75,7 @@ def main(
     all_classes = []
     for c in range(1, 100):
         all_classes.append('obj' + str(c))
-    list_n_top = [1, 3, 5, 10]
+    list_n_top = [1, 5, 10]
     count_success = dict()
     count = dict()
     total = dict()
@@ -185,7 +185,7 @@ class KDTreeMatcher(Matcher):
                          metric=metric, **kwargs)
         self.kd_tree = KDTree([self.get_record_features(record) for record in collection])
 
-    def match(self, image, *args, ntop=5, **kwargs):
+    def match(self, image, *args, ntop=10, **kwargs):
         features = self.get_features(image)
         dd, ii = self.kd_tree.query([features], k=ntop)
         dd = dd[0]

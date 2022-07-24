@@ -22,7 +22,7 @@ class RetrievalApp:
         db_cfg_path='./config/database.json',
         connect_name='mongodb',
         extr_cfg_path='./config/feature_extractor.json',
-        list_features=['Color_Histogram_RGB', 'Color_Histogram_HSV', 'HOG_CIFAR_default'],
+        list_features=['Color_Histogram_RGB'],
     ):
         with open(db_cfg_path) as f:
             db_config = json.load(f)
