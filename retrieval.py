@@ -8,12 +8,27 @@ from scipy.spatial import KDTree
 
 from image_retrieval_utils import *
 
+class EuclideanDistance:
+    def __init__(self) -> None:
+        pass
+
+    def calculate_distance(self, x, y):
+        return np.linalg.norm(x - y)
+
+class HistogramComparison:
+    def __init__(self, compare_method=0) -> None:
+        self.compare_method = compare_method
+
+    def calculate_distance(self, x, y):
+        x = np.array(x, dtype=np.float32)
+        y = np.array(y, dtype=np.float32)
+        return cv2.compareHist(x, y, self.compare_method)
 
 def main(
         db_cfg_path='./config/database.json',
         connect_name='mongodb',
         extr_cfg_path='./config/feature_extractor.json',
-        list_features=['Color_Histogram_RGB', 'Color_Histogram_HSV', 'HOG_CIFAR_default'],
+        list_features=['HOG_16x16x32x32'],
         testset_path='./data/cifar-10/test.json'
 ):
     with open(db_cfg_path) as f:
@@ -47,7 +62,9 @@ def main(
 
     metric = EuclideanDistance()
 
-    matcher = KDTreeMatcher(list_features=list_features, extractors=extractors, collection=collection, metric=metric)
+    # matcher = KDTreeMatcher(list_features=list_features, extractors=extractors, collection=collection, metric=metric)
+
+    matcher = ExhaustiveMatcher(list_features=list_features, extractors=extractors, collection=collection, metric=metric)
 
     with open(testset_path) as f:
         testset_des = json.load(f)
@@ -57,7 +74,10 @@ def main(
         'deer', 'dog', 'frog', 'horse',
         'ship', 'truck'
     ]
-    list_n_top = [1, 3, 5, 10]
+    # all_classes = []
+    # for c in range(1, 100):
+    #     all_classes.append('obj' + str(c))
+    list_n_top = [1, 5, 10]
     count_success = dict()
     count = dict()
     total = dict()
@@ -140,25 +160,25 @@ class Matcher:
         pass
 
 
-# class ExhaustiveMatcher(Matcher):
-#     def __init__(self, *args, list_features=[], extractors=[], collection=None, metric=None, **kwargs):
-#         super().__init__(*args, list_features=list_features, extractors=extractors, collection=collection,
-#                          metric=metric, **kwargs)
-#
-#     def match(self, image, *args, ntop=10, **kwargs):
-#         features = self.get_features(image)
-#         res = []
-#         for record in self.collection:
-#             record_features = self.get_record_features(record)
-#             distance = self.metric.calculate_distance(features, record_features)
-#             res.append((distance, record))
-#             idx = len(res) - 1
-#             while (idx > 0) and (distance < res[idx - 1][0]):
-#                 res[idx], res[idx - 1] = res[idx - 1], res[idx]
-#                 idx -= 1
-#             if len(res) > ntop:
-#                 res.pop(-1)
-#         return res
+class ExhaustiveMatcher(Matcher):
+    def __init__(self, *args, list_features=[], extractors=[], collection=None, metric=None, **kwargs):
+        super().__init__(*args, list_features=list_features, extractors=extractors, collection=collection,
+                         metric=metric, **kwargs)
+
+    def match(self, image, *args, ntop=10, **kwargs):
+        features = self.get_features(image)
+        res = []
+        for record in self.collection:
+            record_features = self.get_record_features(record)
+            distance = self.metric.calculate_distance(features, record_features)
+            res.append((distance, record))
+            idx = len(res) - 1
+            while (idx > 0) and (distance < res[idx - 1][0]):
+                res[idx], res[idx - 1] = res[idx - 1], res[idx]
+                idx -= 1
+            if len(res) > ntop:
+                res.pop(-1)
+        return res
 
 
 class KDTreeMatcher(Matcher):
@@ -167,7 +187,7 @@ class KDTreeMatcher(Matcher):
                          metric=metric, **kwargs)
         self.kd_tree = KDTree([self.get_record_features(record) for record in collection])
 
-    def match(self, image, *args, ntop=5, **kwargs):
+    def match(self, image, *args, ntop=10, **kwargs):
         features = self.get_features(image)
         dd, ii = self.kd_tree.query([features], k=ntop)
         dd = dd[0]
@@ -179,18 +199,3 @@ class KDTreeMatcher(Matcher):
 
 if __name__ == '__main__':
     main()
-class EuclideanDistance:
-    def __init__(self) -> None:
-        pass
-
-    def calculate_distance(self, x, y):
-        return np.linalg.norm(x - y)
-
-class HistogramComparison:
-    def __init__(self, compare_method=0) -> None:
-        self.compare_method = compare_method
-
-    def calculate_distance(self, x, y):
-        x = np.array(x, dtype=np.float32)
-        y = np.array(y, dtype=np.float32)
-        return cv2.compareHist(x, y, self.compare_method)

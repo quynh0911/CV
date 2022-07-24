@@ -28,7 +28,7 @@ def create_cifar_dataset_description(dataset_path='./data/cifar-10', train_descr
     ]
     train = list()
     test = list()
-    size=(32, 32, 3)
+    size = (32, 32, 3)
     for c in classes:
         train_path = '/'.join([dataset_path, 'train', c])
         test_path = '/'.join([dataset_path, 'test', c])
